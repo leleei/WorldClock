@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lv.http.worldclock.R;
@@ -43,6 +44,7 @@ public class AddAttentionActivity extends AppCompatActivity implements QuickInde
     private List<CityCountry> mCityList = new ArrayList<>();
     private List<CityCountry> mTempList = new ArrayList<>();
     private CityListAdapter mCityListAdapter;
+    private ProgressBar mPb;
 
     @Override
 
@@ -50,10 +52,17 @@ public class AddAttentionActivity extends AppCompatActivity implements QuickInde
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_attention);
         initUI();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         initData();
     }
 
     private void initData() {
+        mPb.setVisibility(View.VISIBLE);
+        mLv_city_list.setVisibility(View.GONE);
         Call<TimeList> timeListCall = RetrofitUtil.createHttpApiInstance().getTimeListZone(ParamConstant.LIST_TIME_ZONE_KEY, ParamConstant.LIST_TIME_ZONE_FORMAT);
         timeListCall.enqueue(new Callback<TimeList>() {
             @Override
@@ -68,10 +77,14 @@ public class AddAttentionActivity extends AppCompatActivity implements QuickInde
                 } else {
                     ToastUtil.showShort(AddAttentionActivity.this, "数据加载失败");
                 }
+                mPb.setVisibility(View.GONE);
+                mLv_city_list.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onFailure(Call<TimeList> call, Throwable t) {
+                mPb.setVisibility(View.GONE);
+                mLv_city_list.setVisibility(View.VISIBLE);
                 ToastUtil.showShort(AddAttentionActivity.this, "网络连接失败");
             }
         });
@@ -80,6 +93,7 @@ public class AddAttentionActivity extends AppCompatActivity implements QuickInde
     private void initUI() {
         mBt_cancel = (TextView) findViewById(R.id.bt_cancel);
         mQib = (QuickIndexBar) findViewById(R.id.qib);
+        mPb = (ProgressBar) findViewById(R.id.pb);
         mEt_search = (EditText) findViewById(R.id.et_search);
         mLv_city_list = (ListView) findViewById(R.id.lv_city_list);
         mQib.setOnLetterUpdateListener(this);

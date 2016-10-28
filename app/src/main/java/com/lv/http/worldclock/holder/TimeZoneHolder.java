@@ -34,12 +34,29 @@ public class TimeZoneHolder extends BasicHolder<TimeList.ZonesBean> {
         Date date = new Date(appInfo.getTimestamp());
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         String time = format.format(date);
-        if (new Integer(time.split(":")[0])>=12) {
+        int HRS = appInfo.getGmtOffset() / 3600;
+        mTv_city.setText(split[split.length - 1]);
+        setTime(time, HRS);
+    }
+
+    private void setTime(String time, int HRS) {
+        String t = time.split(":")[0];
+        String m = time.split(":")[1];
+        int hour = Integer.parseInt(t)+HRS;
+        if (hour > 24) {
+            hour -= 24;
+            mTv_time.setText(hour + ":" + m);
+            mTv_gtm.setText("Next day," + HRS + "HRS");
+        } else if (hour < 0) {
+            hour = 24 - hour;
+            mTv_time.setText(hour + ":" + m);
+            mTv_gtm.setText("Yesterday," + HRS + "HRS");
+        } else {
+            mTv_time.setText(hour + ":" + m);
+            mTv_gtm.setText("Today," + HRS + "HRS");
+        }
+        if (hour >= 12) {
             mTv_am.setText("PM");
         }
-        int HRS = appInfo.getGmtOffset() / 3600;
-        mTv_gtm.setText("Today," + HRS + "HRS");
-        mTv_city.setText(split[split.length-1]);
-        mTv_time.setText(time);
     }
 }

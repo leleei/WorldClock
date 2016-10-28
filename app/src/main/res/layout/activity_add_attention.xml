@@ -41,12 +41,22 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ListView
-            android:id="@+id/lv_city_list"
+        <FrameLayout
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent">
-        </ListView>
+            <ProgressBar
+                android:layout_gravity="center"
+                android:id="@+id/pb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ListView
+                android:visibility="invisible"
+                android:id="@+id/lv_city_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </ListView>
+        </FrameLayout>
         <com.lv.http.worldclock.view.widget.QuickIndexBar
             android:id="@+id/qib"
             android:layout_width="20dp"

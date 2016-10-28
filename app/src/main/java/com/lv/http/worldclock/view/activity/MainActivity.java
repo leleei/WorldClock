@@ -6,7 +6,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.lv.http.worldclock.R;
 import com.lv.http.worldclock.adapter.TimeZoneAdapter;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    private ProgressBar mPb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mViewCt = (CommonTitle) findViewById(R.id.view_ct);
         mLvClockZone = (ListView) findViewById(R.id.lv_clock_zone);
+        mPb = (ProgressBar) findViewById(R.id.pb);
         initUI();
     }
 
@@ -68,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
         mViewCt.setOnButtonClickListener(new CommonTitle.OnButtonClickListener() {
             @Override
             public void onClickRightButton() {
-                startActivity(new Intent(MainActivity.this, AddAttentionActivity.class));
+                Intent intent = new Intent(MainActivity.this, AddAttentionActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -80,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTimeData() {
+        mPb.setVisibility(View.VISIBLE);
+        mLvClockZone.setVisibility(View.GONE);
         Call<TimeList> timeListZone = RetrofitUtil.createHttpApiInstance().getTimeListZone(ParamConstant.LIST_TIME_ZONE_KEY, ParamConstant.LIST_TIME_ZONE_FORMAT);
         timeListZone.enqueue(new Callback<TimeList>() {
             @Override
@@ -102,11 +109,15 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ToastUtil.showShort(MainActivity.this, "数据加载失败");
                 }
+                mPb.setVisibility(View.GONE);
+                mLvClockZone.setVisibility(View.VISIBLE);
                 mHandler.sendEmptyMessageDelayed(0, 1000);
             }
 
             @Override
             public void onFailure(Call<TimeList> call, Throwable t) {
+                mPb.setVisibility(View.GONE);
+                mLvClockZone.setVisibility(View.VISIBLE);
                 ToastUtil.showShort(MainActivity.this, "网络连接失败");
             }
         });
@@ -115,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     private void upDateTimer() {
         List<TimeList.ZonesBean> showItems = mTimeZoneAdapter.getShowItems();
         for (TimeList.ZonesBean showItem : showItems) {
-            showItem.setTimestamp(showItem.getTimestamp() + 60000);
+            showItem.setTimestamp(showItem.getTimestamp() + 1000);
         }
         mTimeZoneAdapter.notifyDataSetChanged();
     }
